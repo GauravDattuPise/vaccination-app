@@ -6,25 +6,47 @@ The Vaccine Registration App is a Node.js application that simplifies the proces
 
 ## Key Features
 
-### User Registration and Login
+### User Registration
 
 - Users can create accounts by providing mandatory information, including Name, PhoneNumber, Age, Pincode, and Aadhar No.
+#### https://vaccination-app-service1.onrender.com/registerUser (post)
+{
+    "name" : "Rohit Madane",
+    "phoneNumber" :7894564564,
+    "age" : 22,
+    "password" : "Rohit123@",
+    "aadhaarNo" : 891157894565
+}
+
+### User Login
+
 - Secure user login using PhoneNumber and a password set during registration.
+#### https://vaccination-app-service1.onrender.com/loginUser (post)
+{
+   "phoneNumber" :7894564564,
+    "password" : "Rohit123@"
+}
 
 ### Vaccine Slot Availability
 
 - Users can view the available time slots for vaccine registration on a given day.
 - The available slots are based on the user's vaccination status (first or second dose).
+#### https://vaccination-app-service1.onrender.com/getSlotDetails (post)
+{
+    "date": "2023/09/17"
+}
 
 ### Slot Registration
 
-- Users can register for vaccine slots, specifying whether it's their first or second dose.
+- Users can register for vaccine slots
 - Each vaccine slot has a 30-minute duration, with a maximum of 10 available doses.
 - Once a slot is fully booked, it becomes unavailable for further registrations.
-
-### Second Dose Registration
-
 - Users can register for the second dose only after completing their first dose of the vaccine.
+#### https://vaccination-app-service1.onrender.com/vaccinationSlotBokking (POST)
+{
+       "date": "2023/9/18",
+       "timeSlot": "10:00 AM to 10:30 AM"
+}
 
 ### Slot Modification
 
@@ -34,14 +56,7 @@ The Vaccine Registration App is a Node.js application that simplifies the proces
 
 - Admins can log in using credentials manually created in the database.
 - Admins have access to a dashboard with features to monitor user registrations.
-
-### User Filtering
-
-- Admins can check the total number of registered users and filter them based on Age, Pincode, and Vaccination status (None, First dose completed, All completed).
-
-### Vaccine Slot Details
-
-- Information about the available vaccine slots, including dates, time slots, and available doses, is accessible.
+#### https://vaccination-app-service1.onrender.com/admin/getUsers (get)
 
 ### Vaccination Drive Schedule
 
@@ -49,9 +64,6 @@ The Vaccine Registration App is a Node.js application that simplifies the proces
 - Vaccination timings are from 10 AM to 5 PM daily.
 - Slots are available at 30-minute intervals.
 
-## Usage
 
-1. Users create accounts and log in to the application.
-2. Users view available vaccine slots, select their desired slot, and register.
-3. Admins log in to the admin panel to monitor registrations and manage user data.
+###  mongodb+srv://gauravpise87:Gaurav2001@gauravdb.crgpvot.mongodb.net/Vaccination_App
 
