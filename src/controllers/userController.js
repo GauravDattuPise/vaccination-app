@@ -15,6 +15,28 @@ const registerUser = async (req, res) => {
         if (!password) { return res.status(400).send({ status: false, message: "password is mandatory" }) }
         if (!age) { return res.status(400).send({ status: false, message: "age is mandatory" }) }
         if (!aadhaarNo) { return res.status(400).send({ status: false, message: "aadhaarNo is mandatory" }) }
+       
+
+        const newPhoneNo = String(phoneNumber);
+        if(newPhoneNo.length !== 10){
+            return res.status(400).send({status : false, message : "phone number is invalid (length should be 10)"})
+        }
+
+        const newAadhaarNo = String(aadhaarNo);
+        if(newAadhaarNo.length !== 12){
+            return res.status(400).send({status : false, message : "Aadhaar number is invalid (length should be 12)"})
+        }
+
+       const existingPhoneNumber = await userModel.findOne({phoneNumber})
+       if(existingPhoneNumber){
+        return res.status(409).send({status : false, message : "phone number already registerd"})
+       }
+
+       const existingAadhaarNo = await userModel.findOne({aadhaarNo})
+       if(existingAadhaarNo){
+        return res.status(409).send({status : false, message : "aadhaar number already in use"})
+       }
+       
         userData.password = await bcrypt.hash(password, 10);
         const registeredUser = await userModel.create(userData);
         return res.status(201).send({ status: true, message: "User registered successfully", registeredUser })
@@ -73,29 +95,18 @@ const vaccinationSlotBooking = async (req, res) => {
         // getting data for vaccination slot booking
         let slotData = req.body;
         let { date, timeSlot } = slotData;
-
-        const formattedDate = moment(date).format("ll")
-
         const phoneNumber = req.phoneNumber;
 
+        const formattedDate = moment(date).format("ll")
         const timeParts = timeSlot.split(" to ");
-
-        // Get the end time (second part)
         const endTime = timeParts[1];
-
-        // date and time slot from req.body
         const concatenatedDate = date + " " + endTime;
-        // Create a Moment.js object from the date string
         const localMoment = moment(concatenatedDate, "YYYY-MM-DD hh:mm A");
 
-        // Convert the local Moment.js object to UTC
         const utcMoment = localMoment.utc();
-
-        // Calculate the time left
         const currentTime = moment.utc();
         const timeLeft = moment.duration(utcMoment.diff(currentTime));
 
-        // Get the time left in minutes
         let minutesLeft = timeLeft.asMinutes();
         minutesLeft = parseInt(minutesLeft)
 
