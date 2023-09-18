@@ -3,6 +3,8 @@ const userModel = require("../models/userModel")
 // get registered users
 const getUsers= async(req,res)=>{
      try {
+
+      // getting users in increasing order (age)
         const fetchUser=await  userModel.find().select({_id:0,password:0,__v:0}).sort({age : 1})
         if(fetchUser.length===0){
           return res.status(404).send({status:false,message:"no any user Register"});

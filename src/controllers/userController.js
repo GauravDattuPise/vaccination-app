@@ -5,11 +5,14 @@ const schedule = require('node-schedule');
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
+
+// user register controller
 const registerUser = async (req, res) => {
     try {
         const userData = req.body;
         const { name, phoneNumber, password, age, aadhaarNo } = userData
 
+        // validations
         if (!name) { return res.status(400).send({ status: false, message: "Name is mandatory" }) }
         if (!phoneNumber) { return res.status(400).send({ status: false, message: "phoneNumber is mandatory" }) }
         if (!password) { return res.status(400).send({ status: false, message: "password is mandatory" }) }
@@ -27,19 +30,22 @@ const registerUser = async (req, res) => {
             return res.status(400).send({status : false, message : "Aadhaar number is invalid (length should be 12)"})
         }
 
+        // if phone no already registerd
        const existingPhoneNumber = await userModel.findOne({phoneNumber})
        if(existingPhoneNumber){
         return res.status(409).send({status : false, message : "phone number already registerd"})
        }
 
+        // if aadhaar no already registerd
        const existingAadhaarNo = await userModel.findOne({aadhaarNo})
        if(existingAadhaarNo){
         return res.status(409).send({status : false, message : "aadhaar number already in use"})
        }
        
+       // hasing password
         userData.password = await bcrypt.hash(password, 10);
         const registeredUser = await userModel.create(userData);
-        return res.status(201).send({ status: true, message: "User registered successfully", registeredUser })
+        return res.status(201).send({ status: true, message: "User registered successfully..!", registeredUser })
 
     } catch (error) {
         return res.status(500).send({ status: false, message: "server error in register user", error })
@@ -51,18 +57,24 @@ const loginUser = async (req, res) => {
     try {
         const userData = req.body;
         const { phoneNumber, password } = userData
+
+        // validations
         if (!phoneNumber) { return res.status(400).send({ status: false, message: "phoneNumber is mandatory" }) }
         if (!password) { return res.status(400).send({ status: false, message: "password is mandatory" }) }
 
+        // check phoneNumber already registerd or not
         const findUser = await userModel.findOne({ phoneNumber })
-
         if (!findUser) {
             return res.status(404).send({ status: false, message: " User not found" });
         }
+
+        // comparing password
         const matchPassword = await bcrypt.compare(password, findUser.password);
         if (!matchPassword) {
             return res.status(400).send({ status: false, message: "Invalid Password" });
         }
+
+        // creating token
         const token = jwt.sign({ phoneNumber }, "my-secret-key", { expiresIn: "10h" });
         res.setHeader("token", token)
         return res.status(200).send({ status: true, message: "Token is SuccessFully Generated" });
@@ -74,10 +86,9 @@ const loginUser = async (req, res) => {
     }
 }
 
-
+// getting slot details contrller by daywise
 const getSlotDetails = async (req, res) => {
     try {
-        console.log("heloo")
         let slotData = req.body
         let { date } = slotData;
         const formattedDate = moment(date).format("ll")
@@ -167,10 +178,6 @@ const vaccinationSlotBooking = async (req, res) => {
 
         }
 
-
-
-
-
     } catch (error) {
         console.log(error)
         return res.status(500).send({ status: false, message: "server error in Booked Slots for vaccination", error })
@@ -199,33 +206,24 @@ const changeVaccinationSlot = async (req, res) => {
         let dbDate = findSlot.date
         console.log("currentTime",currentTime);
 
-        // Define the date string
         const dateString = dbDate;
-
-        // Split the date string into parts
         const parts = dateString.split(' ');
-
-        // Define a mapping of month abbreviations to month numbers
         const monthAbbreviations = {
             'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
             'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
         };
 
-        // Extract month, day, and year from the parts
+        // extract month, day, and year from the parts
         const month = monthAbbreviations[parts[0]];
         const day = parseInt(parts[1].replace(',', ''), 10);
         const year = parseInt(parts[2], 10);
 
-        // Create a JavaScript Date object
         const date1 = new Date(year, month, day);
 
-        console.log("date",date1);
-
-
-        // Calculate the difference in milliseconds
+        // the difference in milliseconds
         const differenceMs = currentTime.getTime() - date1.getTime();
 
-        // Convert milliseconds to days
+        // milliseconds to days
         const differenceHours = Math.floor(differenceMs / (1000 * 60 * 60));
         
         if(differenceHours < 24){

@@ -10,6 +10,7 @@ const app = express();
 
 app.use(express.json())
 
+// connecting to db
 mongoose.connect(process.env.MONGO_URL)
 .then(()=> console.log("mongodb is connected"))
 .catch((err) => console.log(err));

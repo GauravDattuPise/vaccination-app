@@ -3,10 +3,13 @@ const { registerUser, getSlotDetails, loginUser, vaccinationSlotBooking, changeV
 const authentication = require("../middlware/authentication");
 const router = express.Router();
 
+// user registration
 router.post("/registerUser", registerUser)
 
+// user login
 router.post("/loginUser", loginUser)
 
+// getting slot details
 router.get("/getSlotDetails",authentication, getSlotDetails);
 
 // slot booking
